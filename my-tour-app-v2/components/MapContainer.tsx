@@ -8,13 +8,15 @@ import { useEffect } from 'react';
 const userIcon = L.icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41], iconAnchor: [12, 41],
+  iconSize: [25, 41], 
+  iconAnchor: [12, 41],
 });
 
 const locationIcon = L.icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41], iconAnchor: [12, 41],
+  iconSize: [25, 41], 
+  iconAnchor: [12, 41],
 });
 
 const locations = [
@@ -36,22 +38,55 @@ function RecenterMap({ lat, lng }: { lat: number; lng: number }) {
 }
 
 export default function MapComponent({ location }: { location: { lat: number; lng: number } | null }) {
-  const defaultCenter: [number, number] = [20.2506, 105.9745];
   return (
-    <MapContainer center={defaultCenter} zoom={13} style={{ height: '100%', width: '100%' }} zoomControl={false}>
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+    <MapContainer 
+      center={[20.2506, 105.9745]} 
+      zoom={13} 
+      style={{ height: '100%', width: '100%' }} 
+      zoomControl={false}
+    >
+      {/* Bản đồ Carto Voyager - Mới, đẹp, miễn phí */}
+      <TileLayer 
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+        attribution='&copy; OpenStreetMap &copy; CARTO'
+        maxZoom={20}
+      />
+
       {locations.map((loc) => (
         <div key={loc.id}>
-          <Circle center={[loc.lat, loc.lng]} radius={loc.radius} pathOptions={{ color: '#3b82f6', fillOpacity: 0.1, dashArray: '5,5' }} />
+          <Circle 
+            center={[loc.lat, loc.lng]} 
+            radius={loc.radius} 
+            pathOptions={{ 
+              color: '#3b82f6', 
+              fillColor: '#3b82f6',
+              fillOpacity: 0.15,
+              weight: 2,
+              dashArray: '5, 5'
+            }} 
+          />
           <Marker position={[loc.lat, loc.lng]} icon={locationIcon}>
-            <Popup><b>{loc.name}</b><br/>Bán kính: {loc.radius}m</Popup>
+            <Popup>
+              <div className="text-center">
+                <p className="font-bold">📍 {loc.name}</p>
+                <p className="text-xs text-gray-500 mt-1">Bán kính: {loc.radius}m</p>
+              </div>
+            </Popup>
           </Marker>
         </div>
       ))}
+
       {location && (
         <>
           <Marker position={[location.lat, location.lng]} icon={userIcon}>
-            <Popup>📍 Vị trí của bạn</Popup>
+            <Popup>
+              <div className="text-center">
+                <p className="font-bold">🧭 Vị trí của bạn</p>
+                <p className="text-xs text-gray-500">
+                  {location.lat.toFixed(5)}, {location.lng.toFixed(5)}
+                </p>
+              </div>
+            </Popup>
           </Marker>
           <RecenterMap lat={location.lat} lng={location.lng} />
         </>
